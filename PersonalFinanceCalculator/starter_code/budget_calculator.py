@@ -1,0 +1,113 @@
+# budget_calculator.py - Personal Finance Calculator
+# Starter code for e002-exercise-python-intro
+def expenseValidation(exp):
+    if(exp < 0): 
+        return 0
+    return exp
+
+"""
+Personal Finance Calculator
+---------------------------
+This program helps users understand their monthly budget by collecting
+income and expense information and displaying a formatted summary.
+
+Complete the TODO sections below to finish the program.
+"""
+
+print("=" * 44)
+print("       PERSONAL FINANCE CALCULATOR")
+print("=" * 44)
+print()
+
+# =============================================================================
+# TODO: Task 1 - Collect User Information
+# =============================================================================
+# Get the user's name
+# Example: name = input("Enter your name: ")
+name = input("Enter your name: ")
+if(name == ''):
+    name = "Anonymous"
+
+
+# Get monthly income (as a float)
+# Remember to convert the input to a float!
+monthlyIncome = float(input("Enter an your monthly income: "))
+if(monthlyIncome <= 0):
+    print("Error: Monthly income has to be a positive non-zero value. Exiting...")
+    exit()
+
+
+# Get expenses for at least 4 categories:
+# - rent: Rent/Housing
+# - utilities: Utilities (electric, water, internet)
+# - food: Food/Groceries
+# - transportation: Transportation (gas, public transit)
+rent = expenseValidation(float(input("Enter your monthly rent: ")))
+utilities = expenseValidation(float(input("Enter the cost of your monthly utilities: ")))
+food = expenseValidation(float(input("Enter your montly food expenses: ")))
+transportation = expenseValidation(float(input("Enter your montly transportation expenses: ")))
+
+
+# =============================================================================
+# TODO: Task 2 - Perform Calculations
+# =============================================================================
+# Calculate total expenses
+totalExpenses = rent + utilities + food + transportation
+
+# Calculate remaining balance (income - expenses)
+remainingBalance = monthlyIncome - totalExpenses
+
+# Calculate savings rate as a percentage
+# Formula: (balance / income) * 100
+savingsRate = (remainingBalance / monthlyIncome) * 100
+
+# Determine financial status
+# - If balance > 0: status = "in the green"
+# - If balance < 0: status = "in the red"
+# - If balance == 0: status = "breaking even"
+if(remainingBalance > 0): 
+    status = "in the green"
+elif(remainingBalance < 0):
+    status = "in the red"
+else:
+    status = 'breaking even'
+
+# =============================================================================
+# TODO: Task 3 - Display Results
+# =============================================================================
+# Create a formatted budget report
+# Use f-strings for formatting
+# Dollar amounts should show 2 decimal places: f"${amount:.2f}"
+# Percentages should show 1 decimal place: f"{rate:.1f}%"
+
+# Example structure:
+# print("=" * 44)
+# print("       MONTHLY BUDGET REPORT")
+# print("=" * 44)
+# print(f"Name: {name}")
+# ... continue building the report ...
+print(f"\n{name}'s Monthly Budget Report\n")
+print(f"Monthly income: ${monthlyIncome:.2f}\n")
+print("EXPENSES")
+print(f"Rent: ${rent:.2f}, {((rent/monthlyIncome)*100):.1f}% of monthly income")
+print(f"Utilities: ${utilities:.2f}, {((utilities/monthlyIncome)*100):.1f}% of monthly income")
+print(f"Food: ${food:.2f}, {((food/monthlyIncome)*100):.1f}% of monthly income")
+print(f"Transportation: ${transportation:.2f}, {((transportation/monthlyIncome)*100):.1f}% of monthly income")
+print(f"TOTAL EXPENSES: ${totalExpenses:.2f}\n")
+print(f"REMAINING BALANCE: ${remainingBalance:.2f}\n")
+print(f"Savings Rate: {savingsRate:.1f}%")
+print(status)
+
+# =============================================================================
+# TODO: Task 4 - Add Validation (Optional Enhancement)
+# =============================================================================
+# Add these validations before calculations:
+# - If name is empty, use "Anonymous"
+# - If income is <= 0, print error and exit
+# - If any expense is negative, treat as 0
+
+# =============================================================================
+# STRETCH GOAL: Category Percentages
+# =============================================================================
+# Add a section showing what percentage each expense is of total income
+# Example: print(f"  - Rent/Housing:    {(rent/income)*100:.1f}% of income")
