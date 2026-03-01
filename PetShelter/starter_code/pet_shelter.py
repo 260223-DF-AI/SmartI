@@ -97,6 +97,11 @@ class Dog(Animal):
         base = super().describe()
         trained = "trained" if self.is_trained else "not trained"
         return f"{base} - {self.breed}, {trained}"
+    
+    # TODO: Write the __str__() method
+    def __str__(self) -> str:
+        # Expanded on the Animal class's __str__ method
+        return f"{super().__str__()}, (Breed: {self.breed}), (Trained: {self.is_trained})"
 
 
 class Cat(Animal):
@@ -144,6 +149,10 @@ class Cat(Animal):
         """
         return f"{super().describe()} - {self.color}, {status}"
 
+    # TODO: Write the __str__() method
+    def __str__(self) -> str:
+        # Expanded on the Animal class's __str__ method
+        return f"{super().__str__()}, (Color: {self.color}), (Indoor/Outdoor: {self.is_indoor})"
 
 # =============================================================================
 # Task 3: Specialized Classes
@@ -174,6 +183,11 @@ class Puppy(Dog):
         """Show age in months for puppies."""
         status = "adopted" if self._adopted else "available"
         return f"{self.name} is a {self.age_months}-month-old {self.breed} puppy ({status})"
+    
+    # TODO: Write the __str__() method
+    def __str__(self) -> str:
+        # Expanded on the Dog class's __str__ method
+        return f"{super().species} (Puppy): {self.name} (Age in months: {self.age}), (Breed: {self.breed})"
 
 
 class ServiceDog(Dog):
@@ -207,6 +221,11 @@ class ServiceDog(Dog):
         # returns the base description for dogs in the shelter along with its service type
         return f"{super().describe()}, {self.service_type}"
 
+    # TODO: Write the __str__() method
+    def __str__(self) -> str:
+        # Expanded on the Dog class's __str__ method
+        return f"{super().__str__()}, (Service Type: {self.service_type})"
+
 
 class Kitten(Cat):
     """A kitten (cat under 1 year old)."""
@@ -239,7 +258,44 @@ class Kitten(Cat):
         # TODO: Similar to Puppy.describe()
         status = "adopted" if self._adopted else "available"
         return f"{self.name} is a {self.age_months}-month-old {self.color} kitten ({status})"
+    
+    # TODO: Write the __str__() method
+    def __str__(self) -> str:
+        # Expanded on the Cat class's __str__ method
+        return f"{super().species} (Kitten): {self.name} (Age in months: {self.age}), (Color: {self.color})"
 
+
+# =============================================================================
+# Stretch Goal 1: Add more animal types (Bird, Rabbit, etc.)
+# =============================================================================
+
+class Bird(Animal):
+
+    def __init__(self, name, age, type, size: str): # Constructor
+        """
+
+        Args:
+            name: Bird's name
+            age: Numerical age in years
+            type: Specific species
+            size: 'large' or 'small' 
+        """
+        super().__init__(name, age, "Bird")
+        self.type = type
+        self.size = size
+
+    def speak(self) -> str:
+        # Birds chirp
+        return f"{self.name} says Chirp! Chirp!"
+    
+    def describe(self) -> str:
+        # Expanded on the Animal class's describe() following Dog and Cat classes as reference
+        return f"{super().describe()} - {self.size}, {self.type}"
+    
+    # TODO: Write the __str__() method
+    def __str__(self) -> str:
+        # Expanded on the Animal class's __str__ method
+        return f"{super().__str__()}, (Size: {self.size}), (Type: {self.type})"
 
 # =============================================================================
 # Task 4: The Shelter Class
@@ -332,6 +388,26 @@ class Shelter:
             print(f"{i}. {animal.describe()}")
         print(f"{'='*50}")
 
+# =============================================================================
+# Stretch Goal 4: Interactive Menu
+# =============================================================================
+
+def menu():
+    userInput = input("""
+    =============================================================================
+    Happy Paws Rescue - Menu
+    =============================================================================
+    1. Add an animal
+    2. Search by name
+    3. List available
+    4. List animals of a certain species
+    5. Adopt an animal
+    6. Get statistics of animals in the shelter
+    7. Display all animals in the shelter
+    8. Exit/Quit
+    """)
+
+    pass
 
 # =============================================================================
 # Task 5: Demonstration
@@ -357,6 +433,9 @@ def main():
 
     # TODO: Add a Kitten
     shelter.add_animal(Kitten("Luna", 2, "Grey"))
+
+    # TODO: Add a Bird
+    shelter.add_animal(Bird("Feathers", 5, "Kiwi", "Small"))
     
     # Display all animals
     shelter.display_all()
