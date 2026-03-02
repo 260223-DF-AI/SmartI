@@ -187,7 +187,7 @@ class Puppy(Dog):
     # TODO: Write the __str__() method
     def __str__(self) -> str:
         # Expanded on the Dog class's __str__ method
-        return f"{super().species} (Puppy): {self.name} (Age in months: {self.age}), (Breed: {self.breed})"
+        return f"{self.species} (Puppy): {self.name} (Age in months: {self.age}), (Breed: {self.breed})"
 
 
 class ServiceDog(Dog):
@@ -262,7 +262,7 @@ class Kitten(Cat):
     # TODO: Write the __str__() method
     def __str__(self) -> str:
         # Expanded on the Cat class's __str__ method
-        return f"{super().species} (Kitten): {self.name} (Age in months: {self.age}), (Color: {self.color})"
+        return f"{self.species} (Kitten): {self.name} (Age in months: {self.age_months}), (Color: {self.color})"
 
 
 # =============================================================================
@@ -392,22 +392,25 @@ class Shelter:
 # Stretch Goal 4: Interactive Menu
 # =============================================================================
 
-def menu():
-    userInput = input("""
-    =============================================================================
-    Happy Paws Rescue - Menu
-    =============================================================================
-    1. Add an animal
-    2. Search by name
-    3. List available
-    4. List animals of a certain species
-    5. Adopt an animal
-    6. Get statistics of animals in the shelter
-    7. Display all animals in the shelter
-    8. Exit/Quit
-    """)
-
-    pass
+def menu(userInput: int) -> int:
+    while(userInput < 1 or userInput > 8): # Prompt user for input until a valid selection is made
+        try:
+            print("""
+=============================================================================
+Happy Paws Rescue - Menu
+=============================================================================
+1. Add an animal
+2. Search by name
+3. List available
+4. List animals of a certain species
+5. Adopt an animal
+6. Get statistics of animals in the shelter
+7. Display all animals in the shelter
+8. Exit/Quit\n""")
+            userInput = int(input("Make your selection: "))
+        except Exception: 
+            print("\nMust enter a whole number 1-8")
+    return userInput        
 
 # =============================================================================
 # Task 5: Demonstration
@@ -457,6 +460,60 @@ def main():
     print(f"  Available: {stats['available']}")
     print(f"  Adopted: {stats['adopted']}")
     print(f"  By Species: {stats['by_species']}")
+
+    # Find by name
+    print()
+    print(f"Finding Luna: {shelter.find_by_name("Luna")}\n")
+    print(f"Finding Lulu: {shelter.find_by_name("Lulu")}\n")
+
+    # List available
+    print("Listing all available animals:")
+    for animal in shelter.list_available():
+        print(animal.describe())
+
+    # List by species
+    print("\nListing all cats:")
+    for animal in shelter.list_by_species("Cat"):
+        print(animal.describe())
+    
+    # Loop menu until user exits it
+    while True:
+        userInput = menu(0) # Displays menu and gets valid user input
+        match(userInput):
+            case 1:
+                pass
+            case 2:
+                animalName = input("Enter a name to search: ")
+                animal = shelter.find_by_name(animalName)
+                if animal == None:
+                    print(f"No animals in the shelter are named {animalName}")
+                else:
+                    print(animal.describe())
+            case 3:
+                shelterList = shelter.list_available()
+                if not shelterList:
+                    print("\nThe shelter doesn't have any animals yet.")
+                else:
+                    for i, animal in enumerate(shelterList, start=1):
+                        print(f"{i}: {animal.describe()}")
+            case 4:
+                species = input("Enter a species to search for: ")
+                speciesList = shelter.list_by_species(species)
+                if(not speciesList):
+                    print(f"\nThere are no {species}s.")
+                else:
+                    for i, animal in enumerate(speciesList, start=1):
+                        print(f"{i}: {animal.describe()}")
+            case 5:
+                animalName = input("Enter the name of the animal you want to adopt: ")
+                shelter.adopt_animal(animalName)
+            case 6:
+                print(shelter.get_statistics())
+            case 7: 
+                shelter.display_all()
+            case 8:
+                print("Finished. Exiting...")
+                exit(-1)
 
 
 if __name__ == "__main__":
