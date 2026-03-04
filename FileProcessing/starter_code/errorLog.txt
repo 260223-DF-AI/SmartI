@@ -1,0 +1,8 @@
+Line 2: Invalid date format 'invalid-date'
+Line 3: Quantity must be a positive integer, got -2
+Line 4: Missing required field 'store_id'
+Line 5: Quantity must be a positive integer, got abc
+Line 2: Invalid date format 'invalid-date'
+Line 3: Quantity must be a positive integer, got -2
+Line 4: Missing required field 'store_id'
+Line 5: Quantity must be a positive integer, got abc
