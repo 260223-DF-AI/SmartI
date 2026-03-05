@@ -80,7 +80,7 @@ def clean_data(df: pd.DataFrame):
         # Add calculated 'total_amount' columns
         quantity = int(df.loc[row, 'quantity'])
         price = float(df.loc[row, 'unit_price'])
-        totals.append(float(str(f"{(quantity * price):.2f}")))
+        totals.append(round(quantity * price, 2))
         
     # Add new 'total_amount' column with values
     df['total_amount'] = totals
@@ -127,27 +127,38 @@ def add_time_features(df: pd.DataFrame):
     df['quarter'] = quarters
     df['is_weekend'] = areWeekends
 
-def sales_by_category(df):
+def sales_by_category(df: pd.DataFrame):
     """
     Calculate total sales and order count by category.
     Returns: DataFrame with columns [category, total_sales, order_count, avg_order_value]
     Sorted by total_sales descending.
     """
-    pass
+    return df.groupby('category')['total_amount'].agg([
+        ('total_sales', 'sum'), 
+        ("order_count", 'count'),
+        ('avg_order_value', 'mean')]).sort_values('total_sales', ascending=False)
 
-def sales_by_region(df):
+def sales_by_region(df: pd.DataFrame):
     """
     Calculate total sales by region.
     Returns: DataFrame with columns [region, total_sales, percentage_of_total]
     """
-    pass
+    totalSum = float(df['total_amount'].sum())
+    byRegionDF = df.groupby('region')['total_amount'].agg([('total_sales', 'sum')])
+    byRegionDF['percent_of_total'] = round((byRegionDF['total_sales'] / totalSum) * 100, 2)
+    return byRegionDF
 
-def top_products(df, n=10):
+def top_products(df: pd.DataFrame, n=10):
     """
     Find top N products by total sales.
     Returns: DataFrame with columns [product_name, category, total_sales, units_sold]
     """
-    pass
+    # group by products
+    return df.groupby('product_name').agg(
+        category = ("category", 'first'),
+        total_sales = pd.NamedAgg(column='total_amount', aggfunc='sum'),
+        units_sold = pd.NamedAgg(column='quantity', aggfunc='sum')
+    ).sort_values('total_sales', ascending=False).head(n)
 
 def daily_sales_trend(df):
     """
@@ -176,3 +187,6 @@ df = load_data("C:/Users/isabe/revature/SmartI/DataAnalysis/starter_code/orders.
 clean_data(df)
 print(df)
 add_time_features(df)
+print(sales_by_category(df))
+print(sales_by_region(df))
+print(top_products(df))
