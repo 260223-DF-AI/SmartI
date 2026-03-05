@@ -160,27 +160,61 @@ def top_products(df: pd.DataFrame, n=10):
         units_sold = pd.NamedAgg(column='quantity', aggfunc='sum')
     ).sort_values('total_sales', ascending=False).head(n)
 
-def daily_sales_trend(df):
+def daily_sales_trend(df: pd.DataFrame):
     """
     Calculate daily sales totals.
     Returns: DataFrame with columns [date, total_sales, order_count]
     """
-    pass
+    copy = df.copy()
+    # change name of 'order_date' to 'date'
+    colNames = list(copy.columns)
+    index = colNames.index('order_date')
+    colNames[index] = 'date'
+    copy.columns = colNames
 
-def customer_analysis(df):
+    # return dataframe based on the doc string
+    return copy.groupby('date').agg(
+        total_sales = ('total_amount', 'sum'),
+        order_count = ('date', 'count')
+    )
+
+def customer_analysis(df: pd.DataFrame):
     """
     Analyze customer purchasing behavior.
     Returns: DataFrame with columns [customer_id, total_spent, order_count, 
              avg_order_value, favorite_category]
     """
-    pass
+    # base analysis
+    customerAnalysis = df.copy().groupby('customer_id').agg(
+        total_spent = ('total_amount', 'sum'),
+        order_count = ('order_id', 'count'),
+        avg_order_value = ('total_amount', 'mean'),
+    ) 
 
-def weekend_vs_weekday(df):
+    # finding favorite category
+    favorite = (
+        df.groupby(['customer_id', 'category'])['total_amount']
+        .sum()
+        .reset_index()
+        .sort_values(['customer_id', 'total_amount'], ascending=[True, False])
+        .drop_duplicates('customer_id')
+        .set_index('customer_id')['category']
+    )
+
+    # add favorite category column to base analysis
+    customerAnalysis['favorite_category'] = favorite
+    return customerAnalysis
+
+def weekend_vs_weekday(df: pd.DataFrame):
     """
     Compare weekend vs weekday sales.
     Returns: Dict with weekend and weekday total sales and percentages.
     """
-    pass
+    totalSum = df['total_amount'].sum() # get total sales
+    weekendSales = df.copy().groupby('is_weekend').agg(
+        total_sales=('total_amount', 'sum'),
+        percentages=('total_amount', lambda amount: round((sum(amount) / totalSum) * 100, 2))
+    )
 
 explore_data(load_data("C:/Users/isabe/revature/SmartI/DataAnalysis/starter_code/orders.csv"))
 df = load_data("C:/Users/isabe/revature/SmartI/DataAnalysis/starter_code/orders.csv")
@@ -188,5 +222,9 @@ clean_data(df)
 print(df)
 add_time_features(df)
 print(sales_by_category(df))
-print(sales_by_region(df))
-print(top_products(df))
+# print(sales_by_region(df))
+# print(top_products(df))
+# print(daily_sales_trend(df))
+# print(customer_analysis(df))
+# print(df)
+# print(weekend_vs_weekday(df))
