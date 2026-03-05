@@ -1,5 +1,6 @@
 from numpy import int64, float64
 import pandas as pd
+from datetime import date
 
 def load_data(filepath):
     """
@@ -55,10 +56,10 @@ def clean_data(df: pd.DataFrame):
     - Add calculated columns: 'total_amount' = quantity * unit_price
     """
     # Remove duplicates
-    df.drop_duplicates()
+    df.drop_duplicates(inplace=True)
 
     # Drop missing values
-    df.dropna()
+    df.dropna(inplace=True)
 
     ## Standardize text columns
 
@@ -92,9 +93,86 @@ def add_time_features(df: pd.DataFrame):
     - quarter
     - is_weekend (boolean)
     """
+    # Initialize lists for the columns to be created
+    dayOfWeek = [] 
+    months = []
+    quarters = []
+    areWeekends = []
+
+    # Iterate over the df
+    for row in df.index:
+        # Get the date
+        orderDate = date.strptime(str(df.loc[row, 'order_date']).split(" ")[0], "%Y-%m-%d")
+
+        # calculate quarter
+        quarter = 0
+        if orderDate.month < 4:
+            quarter = 1
+        elif orderDate.month < 7:
+            quarter = 2
+        elif orderDate.month < 10:
+            quarter = 3
+        else:
+            quarter = 4
+
+        # Add values to respective lists
+        dayOfWeek.append(orderDate.weekday())
+        months.append(orderDate.month)
+        quarters.append(quarter)
+        areWeekends.append(orderDate.weekday() in [5, 6])
+    
+    # Add columns with data to df
+    df['day_of_week'] = dayOfWeek
+    df['month'] = months
+    df['quarter'] = quarters
+    df['is_weekend'] = areWeekends
+
+def sales_by_category(df):
+    """
+    Calculate total sales and order count by category.
+    Returns: DataFrame with columns [category, total_sales, order_count, avg_order_value]
+    Sorted by total_sales descending.
+    """
+    pass
+
+def sales_by_region(df):
+    """
+    Calculate total sales by region.
+    Returns: DataFrame with columns [region, total_sales, percentage_of_total]
+    """
+    pass
+
+def top_products(df, n=10):
+    """
+    Find top N products by total sales.
+    Returns: DataFrame with columns [product_name, category, total_sales, units_sold]
+    """
+    pass
+
+def daily_sales_trend(df):
+    """
+    Calculate daily sales totals.
+    Returns: DataFrame with columns [date, total_sales, order_count]
+    """
+    pass
+
+def customer_analysis(df):
+    """
+    Analyze customer purchasing behavior.
+    Returns: DataFrame with columns [customer_id, total_spent, order_count, 
+             avg_order_value, favorite_category]
+    """
+    pass
+
+def weekend_vs_weekday(df):
+    """
+    Compare weekend vs weekday sales.
+    Returns: Dict with weekend and weekday total sales and percentages.
+    """
     pass
 
 explore_data(load_data("C:/Users/isabe/revature/SmartI/DataAnalysis/starter_code/orders.csv"))
 df = load_data("C:/Users/isabe/revature/SmartI/DataAnalysis/starter_code/orders.csv")
 clean_data(df)
 print(df)
+add_time_features(df)
