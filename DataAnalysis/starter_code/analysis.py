@@ -2,6 +2,8 @@ from numpy import int64, float64
 import pandas as pd
 from datetime import date
 
+from starter_code.visualizations import create_category_bar_chart, create_regional_pie_chart
+
 def load_data(filepath):
     """
     Load the orders dataset.
@@ -14,8 +16,7 @@ def load_data(filepath):
         orders: pd.DataFrame = pd.read_csv(filepath, 
             date_format="%Y-%m-%d", parse_dates=['order_date'], # Parse dates
             na_values=None) # Handle missing values
-
-        print(orders.head())
+        
         return orders # Return clean dataframe
     except Exception as e:
         print(e)
@@ -66,7 +67,7 @@ def clean_data(df: pd.DataFrame):
     # Finding headings for columns that store strings
     strCols = [col for col in df.columns if df[col].dtype == 'str']
 
-    totals = [] # for 'total_ammount's
+    totals = [] # for 'total_amount's
 
     # iterate through df
     for row in df.index:
@@ -133,7 +134,7 @@ def sales_by_category(df: pd.DataFrame):
     Returns: DataFrame with columns [category, total_sales, order_count, avg_order_value]
     Sorted by total_sales descending.
     """
-    return df.groupby('category')['total_amount'].agg([
+    return df.groupby('category', as_index=False)['total_amount'].agg([
         ('total_sales', 'sum'), 
         ("order_count", 'count'),
         ('avg_order_value', 'mean')]).sort_values('total_sales', ascending=False)
@@ -144,7 +145,7 @@ def sales_by_region(df: pd.DataFrame):
     Returns: DataFrame with columns [region, total_sales, percentage_of_total]
     """
     totalSum = float(df['total_amount'].sum())
-    byRegionDF = df.groupby('region')['total_amount'].agg([('total_sales', 'sum')])
+    byRegionDF = df.groupby('region', as_index=False)['total_amount'].agg([('total_sales', 'sum')])
     byRegionDF['percent_of_total'] = round((byRegionDF['total_sales'] / totalSum) * 100, 2)
     return byRegionDF
 
@@ -154,8 +155,7 @@ def top_products(df: pd.DataFrame, n=10):
     Returns: DataFrame with columns [product_name, category, total_sales, units_sold]
     """
     # group by products
-    return df.groupby('product_name').agg(
-        category = ("category", 'first'),
+    return df.groupby('product_name', as_index=False).agg(
         total_sales = pd.NamedAgg(column='total_amount', aggfunc='sum'),
         units_sold = pd.NamedAgg(column='quantity', aggfunc='sum')
     ).sort_values('total_sales', ascending=False).head(n)
@@ -211,20 +211,25 @@ def weekend_vs_weekday(df: pd.DataFrame):
     Returns: Dict with weekend and weekday total sales and percentages.
     """
     totalSum = df['total_amount'].sum() # get total sales
-    weekendSales = df.copy().groupby('is_weekend').agg(
+    weekendSales = df.copy().groupby('day_of_week', as_index=False).agg(
         total_sales=('total_amount', 'sum'),
         percentages=('total_amount', lambda amount: round((sum(amount) / totalSum) * 100, 2))
-    )
+    ).sort_values('day_of_week')
+    return weekendSales
 
 explore_data(load_data("C:/Users/isabe/revature/SmartI/DataAnalysis/starter_code/orders.csv"))
 df = load_data("C:/Users/isabe/revature/SmartI/DataAnalysis/starter_code/orders.csv")
 clean_data(df)
-print(df)
+#print(df)
 add_time_features(df)
-print(sales_by_category(df))
+categorySales = sales_by_category(df)
+print(categorySales)
+create_category_bar_chart(categorySales, "")
+regionSales = sales_by_region(df)
+create_regional_pie_chart(regionSales, "")
 # print(sales_by_region(df))
-# print(top_products(df))
+print(top_products(df))
 # print(daily_sales_trend(df))
 # print(customer_analysis(df))
 # print(df)
-# print(weekend_vs_weekday(df))
+print(weekend_vs_weekday(df))
