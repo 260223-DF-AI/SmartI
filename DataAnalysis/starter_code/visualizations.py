@@ -65,11 +65,61 @@ def create_sales_trend_line(daily_data: pd.DataFrame, output_path):
     - Add proper axis labels and title
     - Save to output_path
     """
-    # I don't think I quite understand what it is asking of me
-    pass
+    # daily_data: DataFrame with columns [date, total_sales, order_count]
+    # Make a copy to avoid modifying the original
+    df = daily_data.copy()
+    
+    # Sort by date
+    df = df.sort_values('date')
+    df['date'] = pd.to_datetime(df['date']).dt.normalize()
+
+    # Calculate 7-day moving average
+    df['weekly_avg'] = df['total_sales'].rolling(window=7, min_periods=1).mean()
+    
+    # Create the plot
+    fig, ax = plt.subplots()
+    
+    # Plot the main sales line
+    df['is_weekend'] = df['date'].dt.dayofweek >= 5
+    ax.plot(df['date'], df['total_sales'],
+            label='Daily Sales', 
+            color='#2E86AB', marker='o',
+            linewidth=1.5, alpha=0.7)
+    weekendDF = df[df['is_weekend']]
+    ax.plot(weekendDF['date'], weekendDF['total_sales'], color='purple', marker='o', linestyle="")
+    # Plot the moving average
+    ax.plot(df['date'], df['weekly_avg'], label='7-Day Moving Average', marker='o', linewidth=2, linestyle='--')
+    
+    # Formatting
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Total Sales ($)')
+    ax.set_title('Daily Sales Trend')
+
+    # Rotate x-axis labels for better readability
+    plt.xticks(rotation=45, ha='right')
+    
+    plt.tight_layout()
+    plt.show()
 
 def createTopProductsHBarChart(df: pd.DataFrame) -> plt:
-    pass
+    product_names = df['product_name']
+    sales = df['total_sales']
+    
+    fig, ax = plt.subplots()
+    
+    # Create horizontal bar chart
+    bars = ax.barh(product_names, sales)
+    
+    # Add value labels on bars
+    ax.bar_label(bars, padding=5, fmt='$%.0f')
+    
+    # Formatting
+    ax.set_xlabel('Total Sales ($)')
+    ax.set_ylabel('Product')
+    ax.set_title('Top 10 Products by Sales')
+    
+    plt.tight_layout()
+    plt.show()
 
 def create_dashboard(df: pd.DataFrame, output_dir):
     """
@@ -82,4 +132,5 @@ def create_dashboard(df: pd.DataFrame, output_dir):
     """
     create_category_bar_chart(df, "")
     create_regional_pie_chart(df, "")
+    create_sales_trend_line(df, "")
     pass

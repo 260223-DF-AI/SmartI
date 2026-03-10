@@ -2,7 +2,7 @@ from numpy import int64, float64
 import pandas as pd
 from datetime import date
 
-from starter_code.visualizations import create_category_bar_chart, create_regional_pie_chart
+from visualizations import create_category_bar_chart, create_regional_pie_chart, create_sales_trend_line, createTopProductsHBarChart
 
 def load_data(filepath):
     """
@@ -173,10 +173,10 @@ def daily_sales_trend(df: pd.DataFrame):
     copy.columns = colNames
 
     # return dataframe based on the doc string
-    return copy.groupby('date').agg(
+    return copy.groupby('date', as_index=False).agg(
         total_sales = ('total_amount', 'sum'),
         order_count = ('date', 'count')
-    )
+    ).sort_values('date')
 
 def customer_analysis(df: pd.DataFrame):
     """
@@ -211,25 +211,8 @@ def weekend_vs_weekday(df: pd.DataFrame):
     Returns: Dict with weekend and weekday total sales and percentages.
     """
     totalSum = df['total_amount'].sum() # get total sales
-    weekendSales = df.copy().groupby('day_of_week', as_index=False).agg(
+    weekendSales = df.copy().groupby('is_weekend', as_index=False).agg(
         total_sales=('total_amount', 'sum'),
         percentages=('total_amount', lambda amount: round((sum(amount) / totalSum) * 100, 2))
-    ).sort_values('day_of_week')
+    )
     return weekendSales
-
-explore_data(load_data("C:/Users/isabe/revature/SmartI/DataAnalysis/starter_code/orders.csv"))
-df = load_data("C:/Users/isabe/revature/SmartI/DataAnalysis/starter_code/orders.csv")
-clean_data(df)
-#print(df)
-add_time_features(df)
-categorySales = sales_by_category(df)
-print(categorySales)
-create_category_bar_chart(categorySales, "")
-regionSales = sales_by_region(df)
-create_regional_pie_chart(regionSales, "")
-# print(sales_by_region(df))
-print(top_products(df))
-# print(daily_sales_trend(df))
-# print(customer_analysis(df))
-# print(df)
-print(weekend_vs_weekday(df))

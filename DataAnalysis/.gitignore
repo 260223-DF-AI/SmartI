@@ -1,2 +1,6 @@
 venv
 __pycache__
+.vscode
+.env
+.pytest_cache
+e008-data-analysis.md
