@@ -1,9 +1,12 @@
 import pytest
-from src.generators import read_lines, batch, filter_by
+from generators import read_lines, batch, filter_by
+from dotenv import load_dotenv
+import os
 
 def test_batch_correct_sizes():
     """Batch should yield correct batch sizes."""
     result = list(batch(range(7), 3))
+    print(result)
     assert len(result) == 3
     assert len(result[0]) == 3
     assert len(result[2]) == 1
@@ -27,4 +30,8 @@ def test_filter_by_predicate():
 
 def test_read_lines_skips_empty():
     """Read lines should skip empty lines."""
-    pass
+    load_dotenv()
+    filepath = os.getenv("FILEPATH")
+    lines = list(read_lines(filepath))
+    assert len(lines) == 3
+    assert lines == ["Hello", 'This is my file', 'With empty lines for testing']

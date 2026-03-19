@@ -3,3 +3,4 @@ __pycache__
 app.log
 .pytest_cache
 e010-advanced-python.md
+.env

@@ -1,4 +1,3 @@
-from math import ceil
 def read_lines(filepath, encoding='utf-8'):
     """
     Yield lines from a file one at a time.
@@ -28,16 +27,18 @@ def batch(iterable, size):
         list(batch([1,2,3,4,5,6,7], 3))
         # [[1,2,3], [4,5,6], [7]]
     """
+    itList = [elem for elem in iterable]
     start = 0
-    end = start + size + 1
-    for i in range(ceil(len(iterable) / size)):
-        if(len(iterable) - start < end): # make sure I am not trying to access indecies that don't exist
-            end = len(iterable)
-        yield iterable[start:end]
+    end = start + size
+    for i in range(size):
+        yield itList[start:end]
 
         # increment my values
         start = end
-        end += size + 1
+        if(end + size > len(itList)): # making sure I don't access indicies that are out of range
+            end = len(itList)
+        else:
+            end += size
 
 def filter_by(iterable, predicate):
     """

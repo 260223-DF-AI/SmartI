@@ -1,5 +1,5 @@
 import pytest
-from src.decorators import timer, retry, cache
+from decorators import timer, retry, cache
 
 def test_timer_returns_result():
     """Timer decorator should not affect return value."""
