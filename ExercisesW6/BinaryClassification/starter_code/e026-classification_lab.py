@@ -1,0 +1,86 @@
+import torch
+import torch.nn as nn
+import torch.optim as optim
+
+# Toy Dataset
+# X: Time on site (minutes)
+# y: Purchased (1) or Did Not Purchase (0)
+X = torch.tensor([[0.5], [1.0], [2.5], [5.0], [8.0], [12.0]], dtype=torch.float32)
+y = torch.tensor([[0.0], [0.0], [0.0], [1.0], [1.0], [1.0]], dtype=torch.float32)
+
+class PurchaseClassifier(nn.Module):
+    """
+    Task 1: Build the Model Architecture
+    """
+    def __init__(self):
+        # TODO: Initialize the parent class
+        super(PurchaseClassifier, self).__init__()
+        # TODO: Define a linear layer (1 input -> 1 output)
+        self.classifier = nn.Linear(1, 1)
+        
+    def forward(self, x):
+        # TODO: Route x through the linear layer and return it
+        return self.classifier(x)
+
+def train_classifier():
+    """
+    Task 2: Train the Model with Scheduling
+    """
+    # 1. Instantiate the model
+    model = PurchaseClassifier() # DONE: Instantiate PurchaseClassifier
+    
+    # 2. Define Loss, Optimizer, and Scheduler
+    # TODO: Use BCEWithLogitsLoss
+    criterion = nn.BCEWithLogitsLoss()
+    
+    # TODO: Use Adam optimizer with lr=0.5
+    optimizer = optim.Adam(model.parameters(), lr=0.5)
+    
+    # TODO: Use StepLR, step_size=20, gamma=0.5
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.5)
+    
+    epochs = 100
+    
+    print("--- Starting Training ---")
+    for epoch in range(epochs):
+        model.train() # type: ignore
+        
+        # --- THE 5 STEPS OF TRAINING ---
+        # 1. Forward pass
+        predictions = model(X)
+        
+        # 2. Compute Loss
+        loss = criterion(predictions, y)
+        
+        # 3. Zero gradients
+        optimizer.zero_grad()
+        
+        # 4. Backward pass
+        loss.backward()
+        
+        # 5. Optimizer step
+        optimizer.step()
+        
+        # --- SCHEDULER STEP ---
+        # TODO: Step the scheduler
+        scheduler.step()
+        
+        if (epoch + 1) % 20 == 0:
+            current_lr = scheduler.get_last_lr()[0] # pyright: ignore[reportAttributeAccessIssue]
+            print(f"Epoch {epoch+1:03d} | Loss: {loss.item():.4f} | LR: {current_lr:.4f}") # pyright: ignore[reportAttributeAccessIssue]
+            
+    # Evaluation / Inference
+    model.eval() # pyright: ignore[reportAttributeAccessIssue]
+    with torch.no_grad():
+        test_low = torch.tensor([[0.5]])
+        test_high = torch.tensor([[10.0]])
+        
+        pred_low = model(test_low).item() # pyright: ignore[reportOptionalCall]
+        pred_high = model(test_high).item() # type: ignore
+        
+        print("\n--- Final Testing ---")
+        print(f"Raw Output (Logit) for 0.5 mins: {pred_low:.4f}")
+        print(f"Raw Output (Logit) for 10.0 mins: {pred_high:.4f}")
+
+if __name__ == "__main__":
+    train_classifier()
